@@ -4,3 +4,5 @@ server:
     HOST: localhost
 database:
     URL: mongodb+srv://nil:nil@cluster0.bxm5l.mongodb.net/
+auth:
+    JWKS_URI: http://localhost:9001/.well-known/jwks.json

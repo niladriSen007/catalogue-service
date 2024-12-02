@@ -1,6 +1,6 @@
 server:
-  PORT: 5001
-  NODE_ENV: development
-  HOST: localhost
+    PORT: 5001
+    NODE_ENV: development
+    HOST: localhost
 database:
-  URL: mongodb://localhost:27017/catalog?authSource=admin&w=1
+    URL: mongodb+srv://nil:nil@cluster0.bxm5l.mongodb.net/

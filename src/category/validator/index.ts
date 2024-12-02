@@ -8,9 +8,7 @@ export default [
         .withMessage('Category name must be a string'),
     body('priceConfiguration')
         .exists()
-        .withMessage('Price configuration is required')
-        .isString()
-        .withMessage('Description must be a string'),
+        .withMessage('Price configuration is required'),
     body('priceConfiguration.*.priceType')
         .exists()
         .withMessage('Price type is required')

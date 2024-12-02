@@ -1,26 +1,11 @@
 import { model, Schema } from 'mongoose';
+import {
+    Attributes,
+    CategoryModel,
+    PriceConfiguration,
+} from '../../common/types';
 
-interface PriceConfiguaration {
-    [key: string]: {
-        priceType: 'base' | 'additional';
-        availableOptions: string[];
-    };
-}
-
-interface Attributes {
-    name: string;
-    widgetType: 'switch' | 'radio';
-    defaultValue: string;
-    availableOptions: string[];
-}
-
-export interface CategoryModel {
-    name: string;
-    priceConfiguaration: PriceConfiguaration;
-    attributes: Attributes[];
-}
-
-const PriceConfigurationSchema = new Schema<PriceConfiguaration>({
+const PriceConfigurationSchema = new Schema<PriceConfiguration>({
     priceType: {
         type: String,
         enum: ['base', 'additional'],
@@ -57,7 +42,7 @@ const CategorySchema = new Schema<CategoryModel>({
         type: String,
         required: true,
     },
-    priceConfiguaration: {
+    priceConfiguration: {
         type: Map,
         of: PriceConfigurationSchema,
         required: true,

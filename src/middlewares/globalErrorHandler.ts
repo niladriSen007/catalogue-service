@@ -11,7 +11,6 @@ export const globalErrorHandler = (
     res: Response,
     next: NextFunction,
 ) => {
-
     const errorId = uuidv4();
     const status = err?.status || err?.statusCode || 500;
 

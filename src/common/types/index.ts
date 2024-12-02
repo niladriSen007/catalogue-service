@@ -27,3 +27,18 @@ export interface Cookie {
     accessToken: string;
     refreshToken: string;
 }
+
+export enum Roles {
+    ADMIN = 'ADMIN',
+    CUSTOMER = 'CUSTOMER',
+    MANAGER = 'MANAGER',
+}
+
+export interface AuthRequest extends Request {
+    auth: {
+        sub: string;
+        roles?: string;
+        email?: string;
+        id?: number;
+    };
+}

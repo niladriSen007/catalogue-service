@@ -51,6 +51,8 @@ const CategorySchema = new Schema<CategoryModel>({
         type: [AttributesSchema],
         required: true,
     },
+},{
+    timestamps: true,
 });
 
 export default model<CategoryModel>('Category', CategorySchema);

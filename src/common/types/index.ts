@@ -23,6 +23,10 @@ export interface CreateCategoryRequest extends Request {
     body: CategoryModel;
 }
 
+export interface UpdateCategoryRequest extends Request {
+    body: CategoryModel;
+}
+
 export interface Cookie {
     accessToken: string;
     refreshToken: string;

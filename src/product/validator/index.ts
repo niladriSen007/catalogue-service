@@ -21,13 +21,13 @@ const CreateProductValidator = [
     body('categoryId')
         .exists()
         .withMessage('Category is required'),
-    body('imageUrl')
+   /*  body('imageUrl')
         .exists()
         .custom(({ req }) => {
             if (!req?.files) throw new Error('Image URL is required');
             return true;
         })
-        .withMessage('Image URL is required'),
+        .withMessage('Image URL is required'), */
 ];
 
 export {CreateProductValidator}

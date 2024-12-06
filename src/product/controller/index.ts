@@ -4,10 +4,14 @@ import createHttpError from 'http-errors';
 import { Logger } from 'winston';
 import { ProductService } from '../service';
 import { CreateProductRequest } from '../types';
+import { FileStorage } from '../../common/types/storage';
+import {v4 as uuidv4} from 'uuid';
+import { UploadedFile } from 'express-fileupload';
 export class ProductController {
     constructor(
         private readonly productService: ProductService,
         private readonly logger: Logger, 
+        private readonly fileStorage: FileStorage,
     ) {}
     create = async (
         req: CreateProductRequest,
@@ -22,6 +26,16 @@ export class ProductController {
                 }),
             );
         }
+
+        //image upload
+        const image = req.files?.imageUrl as UploadedFile
+
+        const imageName = uuidv4();
+        await this.fileStorage.uploadFile({
+            fileName: imageName,
+            fileData: image.data.buffer,
+        });
+
         const {
             name,
             description,
@@ -39,7 +53,7 @@ export class ProductController {
             tenantId,
             categoryId,
             isPublished,
-            imageUrl: '',
+            imageUrl: imageName,
         });
 
         res.status(201).json({

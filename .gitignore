@@ -84,6 +84,9 @@ web_modules/
 .env.prod
 .env.test
 
+
+config
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -135,4 +138,3 @@ dist
 .pnp.*
 
 logs
-/config

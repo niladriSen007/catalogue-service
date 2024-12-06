@@ -5,6 +5,6 @@ export interface ImageFileData {
 
 export interface FileStorage {
     uploadFile(file: ImageFileData): Promise<string>;
-    deleteFile(fileName: string): void;
+    deleteFile(fileName: string): Promise<void>;
     getObjectUri(fileName: string): string;
 }

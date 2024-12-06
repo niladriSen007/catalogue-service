@@ -4,7 +4,7 @@ import authentication from '../../middlewares/authentication';
 import { isValidRoleMiddleware } from '../../middlewares/isValidRoleMiddleware';
 import { Roles } from '../../common/types';
 import { requestWrapper } from '../../common/wrapper';
-import { CreateProductValidator } from '../validator';
+import { CreateProductValidator, UpdateProductValidator } from '../validator';
 import { ProductService } from '../service';
 import { logger } from '../../config/logger';
 import fileUpload from "express-fileupload"
@@ -31,6 +31,23 @@ router.post(
     }),
     CreateProductValidator,
     requestWrapper(productController.create.bind(productController)),
+);
+
+
+router.patch(
+    '/:id',
+    authentication as RequestHandler,
+    isValidRoleMiddleware([Roles.ADMIN]) as RequestHandler,
+    fileUpload({
+        limits: { fileSize: 500 * 1024 },
+        abortOnLimit: true,
+        limitHandler: (req, res,next) => {
+            next(createHttpError(400, 'File size limit has been reached!'));
+            res.status(400).json({ message: 'File size limit has been reached!' });
+        }
+    }),
+    UpdateProductValidator,
+    requestWrapper(productController.update.bind(productController)),
 );
 
 export default router;

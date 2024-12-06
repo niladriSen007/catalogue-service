@@ -1,6 +1,6 @@
 import { Config } from '../../config';
 import { FileStorage, ImageFileData } from '../types/storage';
-import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, DeleteObjectCommandInput, PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 export class S3Storage implements FileStorage {
     private readonly s3Client: S3Client;
     constructor() {
@@ -27,11 +27,12 @@ export class S3Storage implements FileStorage {
         
     };
     deleteFile = async (fileName: string): Promise<void> => {
-        const params = {
+          const params : DeleteObjectCommandInput = {
             Bucket: Config.S3_BUCKET_NAME,
             Key: fileName,
+            
         };
-        await this.s3Client.send(new PutObjectCommand(params));
+        await this.s3Client.send(new DeleteObjectCommand(params));
     };
     getObjectUri = (fileName: string): string => {
         return `https://${Config.S3_BUCKET_NAME}.s3.${Config.AWS_REGION}.amazonaws.com/${fileName}`;

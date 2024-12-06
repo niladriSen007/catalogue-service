@@ -1,3 +1,0 @@
-server:
-  PORT: 5001
-  NODE_ENV: production

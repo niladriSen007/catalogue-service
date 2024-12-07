@@ -1,6 +1,5 @@
-import { PriceConfiguration } from './../../common/types/index';
-import mongoose from 'mongoose';
 import { Request } from 'express-jwt';
+import mongoose from 'mongoose';
 
 export interface CreateProduct {
     _id?: mongoose.Types.ObjectId;

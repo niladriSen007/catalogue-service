@@ -7,6 +7,7 @@ import { CreateProductRequest } from '../types';
 import { FileStorage } from '../../common/types/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedFile } from 'express-fileupload';
+import { AuthRequest, Roles } from '../../common/types';
 export class ProductController {
     constructor(
         private readonly productService: ProductService,
@@ -62,7 +63,7 @@ export class ProductController {
         });
     };
 
-    update = async ( req: Request, res: Response, next: NextFunction) => {
+    update = async ( req: AuthRequest, res: Response, next: NextFunction) => {
         const result = validationResult(req);
         if (!result.isEmpty()) {
             return next(
@@ -79,6 +80,16 @@ export class ProductController {
             return next(createHttpError(404, 'Product not found'));
         }
 
+        if(!req.auth.roles?.includes(Roles.ADMIN)){
+            //Check if tenant has access to the product
+        const tenant = req?.auth.tenantId;
+        /*         console.log(req.auth,existingProduct.tenantId,"auth");
+         */
+                if(existingProduct.tenantId.toString() !== tenant.toString()){
+                    return next(createHttpError(403, 'You are not authorized to perform this action'));
+                }
+        
+        }
         let imageName: string | undefined ;
         let oldImage:string;
 

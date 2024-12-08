@@ -1,5 +1,6 @@
+import { paginationLabels } from '../../config/pagination';
 import ProductModel from '../model/Product.Model';
-import { CreateProduct, Filter } from '../types';
+import { CreateProduct, Filter, Pagination } from '../types';
 
 export class ProductService {
     create = async (product: CreateProduct) =>
@@ -10,43 +11,53 @@ export class ProductService {
     update = async (id: string, product: CreateProduct) =>
         await ProductModel.findByIdAndUpdate(id, product, { new: true });
 
-    findAll = async (filter: Filter = {}, q: string = '') =>{
-
+    findAll = async (
+        filter: Filter = {},
+        q: string = '',
+        pagination: Pagination = {
+            page: 1,
+            limit: 10,
+        },
+    ) => {
         const searchQueryRegex = new RegExp(q, 'i');
         const query = {
             ...filter,
-            name: searchQueryRegex
+            name: searchQueryRegex,
         };
 
-        const aggregaetProducts =  ProductModel.aggregate([
+        const aggregaetProducts = ProductModel.aggregate([
             {
-                $match:query
+                $match: query,
             },
             {
-                $lookup:{
-                    from:'categories',
-                    localField:'categoryId',
-                    foreignField:'_id',
-                    as:'category',
-                    pipeline:[
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categoryId',
+                    foreignField: '_id',
+                    as: 'category',
+                    pipeline: [
                         {
-                            $project:{
-                                _id:1,
-                                name:1,
-                                attributes:1,
-                                priceConfiguration:1
-                            }
-                        }
-                    ]
-                }
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                attributes: 1,
+                                priceConfiguration: 1,
+                            },
+                        },
+                    ],
+                },
             },
             {
-                $unwind:'$category'
+                $unwind: '$category',
             },
-           
-        ])
+        ]);
 
-        const products = await aggregaetProducts.exec();
-        return products as CreateProduct[];
-    }
+        return ProductModel.aggregatePaginate(aggregaetProducts, {
+            ...pagination,
+            customLabels: paginationLabels
+        });
+
+        /* const products = await aggregaetProducts.exec();
+        return products as CreateProduct[]; */
+    };
 }

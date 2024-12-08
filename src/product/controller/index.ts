@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 import { Logger } from 'winston';
 import { ProductService } from '../service';
-import { CreateProductRequest, Filter } from '../types';
+import { CreateProductRequest, Filter, Pagination } from '../types';
 import { FileStorage } from '../../common/types/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedFile } from 'express-fileupload';
@@ -137,24 +137,34 @@ export class ProductController {
     };
 
     getAll = async (req: Request, res: Response, next: NextFunction) => {
-        const { q, tenantId, categoryId, isPublished } = req.query;
+        const { q, tenantId, categoryId, isPublished, page, limit } = req.query;
 
         const filter: Filter = {};
+        const pagination: Pagination = {};
         if (isPublished == 'true') {
             filter.isPublished = true;
         }
-
 
         if (tenantId) {
             filter.tenantId = tenantId as string;
         }
 
-        if(categoryId && Types.ObjectId.isValid(categoryId as string)){
+        if (categoryId && Types.ObjectId.isValid(categoryId as string)) {
             filter.categoryId = new Types.ObjectId(categoryId as string);
         }
+
+        if (page) {
+            pagination.page = parseInt(page as string);
+        }
+
+        if (limit) {
+            pagination.limit = parseInt(limit as string);
+        }
+
         const products = await this.productService.findAll(
             filter,
             q as string,
+            pagination,
         );
         res.status(200).json({
             status: 'success',

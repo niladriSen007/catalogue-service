@@ -1,3 +1,4 @@
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import mongoose, { model, Schema } from 'mongoose';
 
 const PriceConfigurationSchema = new Schema({
@@ -6,7 +7,7 @@ const PriceConfigurationSchema = new Schema({
         enum: ['base', 'additional'],
     },
     availableOptions: {
-        type: Map<string,number>,
+        type: Map<string, number>,
         of: Number,
     },
 });
@@ -36,5 +37,7 @@ const ProductSchema = new mongoose.Schema(
         timestamps: true,
     },
 );
+
+ProductSchema.plugin(aggregatePaginate);
 
 export default model('Product', ProductSchema);

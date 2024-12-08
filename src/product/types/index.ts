@@ -32,5 +32,11 @@ export interface CreateProductRequest extends Request{
 export interface Filter{
     tenantId ?: string,
     categoryId ?: mongoose.Types.ObjectId,
-    isPublished ?: boolean
+    isPublished ?: boolean,
+
+}
+
+export interface Pagination {
+    page ?: number,
+    limit ?: number
 }

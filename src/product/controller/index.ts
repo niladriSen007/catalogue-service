@@ -33,7 +33,7 @@ export class ProductController {
         const image = req.files?.imageUrl as UploadedFile;
 
         const imageName = uuidv4();
-        await this.fileStorage.uploadFile({
+        const imageUrl =  await this.fileStorage.uploadFile({
             fileName: imageName,
             fileData: image.data.buffer,
         });
@@ -55,7 +55,7 @@ export class ProductController {
             tenantId,
             categoryId,
             isPublished,
-            imageUrl: imageName,
+            imageUrl: imageUrl,
         });
 
         res.status(201).json({

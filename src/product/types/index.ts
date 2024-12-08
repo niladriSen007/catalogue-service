@@ -28,3 +28,9 @@ export interface CreateProduct {
 export interface CreateProductRequest extends Request{
     body: CreateProduct;
 }
+
+export interface Filter{
+    tenantId ?: string,
+    categoryId ?: mongoose.Types.ObjectId,
+    isPublished ?: boolean
+}

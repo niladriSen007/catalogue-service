@@ -15,7 +15,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/v1/category', categoryRouter);
-app.use('/api/v1/product', productRouter);
+app.use('/api/v1/products', productRouter);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Hello World' });

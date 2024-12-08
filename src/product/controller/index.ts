@@ -1,13 +1,14 @@
-import { NextFunction, Response,Request } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 import { Logger } from 'winston';
 import { ProductService } from '../service';
-import { CreateProductRequest } from '../types';
+import { CreateProductRequest, Filter } from '../types';
 import { FileStorage } from '../../common/types/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedFile } from 'express-fileupload';
 import { AuthRequest, Roles } from '../../common/types';
+import { Types } from 'mongoose';
 export class ProductController {
     constructor(
         private readonly productService: ProductService,
@@ -63,7 +64,7 @@ export class ProductController {
         });
     };
 
-    update = async ( req: AuthRequest, res: Response, next: NextFunction) => {
+    update = async (req: AuthRequest, res: Response, next: NextFunction) => {
         const result = validationResult(req);
         if (!result.isEmpty()) {
             return next(
@@ -76,24 +77,28 @@ export class ProductController {
         const id = req.params.id;
         const existingProduct = await this.productService.findById(id);
 
-        if(!existingProduct){
+        if (!existingProduct) {
             return next(createHttpError(404, 'Product not found'));
         }
 
-        if(!req.auth.roles?.includes(Roles.ADMIN)){
+        if (!req.auth.roles?.includes(Roles.ADMIN)) {
             //Check if tenant has access to the product
-        const tenant = req?.auth.tenantId;
-        /*         console.log(req.auth,existingProduct.tenantId,"auth");
-         */
-                if(existingProduct.tenantId.toString() !== tenant.toString()){
-                    return next(createHttpError(403, 'You are not authorized to perform this action'));
-                }
-        
+            const tenant = req?.auth.tenantId;
+            /*         console.log(req.auth,existingProduct.tenantId,"auth");
+             */
+            if (existingProduct.tenantId.toString() !== tenant.toString()) {
+                return next(
+                    createHttpError(
+                        403,
+                        'You are not authorized to perform this action',
+                    ),
+                );
+            }
         }
-        let imageName: string | undefined ;
-        let oldImage:string;
+        let imageName: string | undefined;
+        let oldImage: string;
 
-        if(req?.files?.imageUrl){
+        if (req?.files?.imageUrl) {
             const image = req.files?.imageUrl as UploadedFile;
             imageName = uuidv4();
             oldImage = existingProduct.imageUrl;
@@ -114,8 +119,7 @@ export class ProductController {
             isPublished,
         } = req.body;
 
-
-        const updatedProduct = await this.productService.update(id,{
+        const updatedProduct = await this.productService.update(id, {
             name,
             description,
             priceConfiguration: JSON.parse(priceConfiguration as string),
@@ -126,12 +130,35 @@ export class ProductController {
             imageUrl: imageName ?? existingProduct.imageUrl,
         });
 
-
-       
-
         res.status(200).json({
             status: 'success',
             data: updatedProduct,
+        });
+    };
+
+    getAll = async (req: Request, res: Response, next: NextFunction) => {
+        const { q, tenantId, categoryId, isPublished } = req.query;
+
+        const filter: Filter = {};
+        if (isPublished == 'true') {
+            filter.isPublished = true;
+        }
+
+
+        if (tenantId) {
+            filter.tenantId = tenantId as string;
+        }
+
+        if(categoryId && Types.ObjectId.isValid(categoryId as string)){
+            filter.categoryId = new Types.ObjectId(categoryId as string);
+        }
+        const products = await this.productService.findAll(
+            filter,
+            q as string,
+        );
+        res.status(200).json({
+            status: 'success',
+            data: products,
         });
     };
 }

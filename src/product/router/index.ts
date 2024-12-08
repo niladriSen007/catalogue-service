@@ -41,7 +41,7 @@ router.post(
 router.patch(
     '/:id',
     authentication as RequestHandler,
-    isValidRoleMiddleware([Roles.ADMIN,Roles.MANAGER]) as RequestHandler,
+    isValidRoleMiddleware([Roles.ADMIN, Roles.MANAGER]) as RequestHandler,
     fileUpload({
         limits: { fileSize: 500 * 1024 },
         abortOnLimit: true,
@@ -57,6 +57,13 @@ router.patch(
         async (req, res, next) =>
             await productController.update(req as AuthRequest, res, next),
     ),
+);
+
+router.get(
+    '/',
+    requestWrapper(async (req, res, next) => {
+        await productController.getAll(req, res, next);
+    }),
 );
 
 export default router;

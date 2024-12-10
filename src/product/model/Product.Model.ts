@@ -7,7 +7,7 @@ const PriceConfigurationSchema = new Schema({
         enum: ['base', 'additional'],
     },
     availableOptions: {
-        type: Map<string, number>,
+        type: Map,
         of: Number,
     },
 });

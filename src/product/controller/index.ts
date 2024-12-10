@@ -96,13 +96,14 @@ export class ProductController {
             }
         }
         let imageName: string | undefined;
+        let uploadedImageUrl: string | undefined;
         let oldImage: string;
 
         if (req?.files?.imageUrl) {
             const image = req.files?.imageUrl as UploadedFile;
             imageName = uuidv4();
             oldImage = existingProduct.imageUrl;
-            await this.fileStorage.uploadFile({
+            uploadedImageUrl = await this.fileStorage.uploadFile({
                 fileName: imageName,
                 fileData: image.data.buffer,
             });
@@ -127,7 +128,7 @@ export class ProductController {
             tenantId,
             categoryId,
             isPublished,
-            imageUrl: imageName ?? existingProduct.imageUrl,
+            imageUrl: uploadedImageUrl ?? existingProduct.imageUrl,
         });
 
         res.status(200).json({
@@ -169,6 +170,32 @@ export class ProductController {
         res.status(200).json({
             status: 'success',
             data: products,
+        });
+    };
+
+    getById = async (req: Request, res: Response, next: NextFunction) => {
+        const id = req.params.id;
+        const product = await this.productService.findById(id);
+        if (!product) {
+            return next(createHttpError(404, 'Product not found'));
+        }
+        res.status(200).json({
+            status: 'success',
+            data: product,
+        });
+    };
+
+
+    delete = async (req: Request, res: Response, next: NextFunction) => {
+        const id = req.params.id;
+        const existingProduct = await this.productService.findById(id);
+        if (!existingProduct) {
+            return next(createHttpError(404, 'Product not found'));
+        }
+        await this.productService.delete(id);
+        res.status(200).json({
+            status: 'success',
+            message: 'Product deleted successfully',
         });
     };
 }

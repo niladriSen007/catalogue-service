@@ -30,7 +30,15 @@ export class CategoryService {
     }
 
     async getCategories() {
-        return await CategoryModel.find();
+        const getAllCategories = await CategoryModel.find();
+        const allCategories = [
+            ...getAllCategories,
+            {
+                "_id": "All",
+                "name": "All",
+            }
+        ]
+        return allCategories;
     }
 
     async deleteCategory(id: string) {

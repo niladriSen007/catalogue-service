@@ -32,11 +32,12 @@ export class ProductController {
         //image upload
         const image = req.files?.imageUrl as UploadedFile;
 
-
         // console.log(image,"image");
 
         const imageName = uuidv4();
-        const imageUrl =  await this.fileStorage.uploadFile(req.files?.imageUrl as UploadedFile);
+        const imageUrl = await this.fileStorage.uploadFile(
+            req.files?.imageUrl as UploadedFile,
+        );
 
         const {
             name,
@@ -134,8 +135,10 @@ export class ProductController {
         });
     };
 
-    getAll = async (req: Request, res: Response, next: NextFunction) => {
+    getAll = async (req: AuthRequest, res: Response, next: NextFunction) => {
         const { q, tenantId, categoryId, isPublished, page, limit } = req.query;
+
+        console.log(req.auth, 'query');
 
         const filter: Filter = {};
         const pagination: Pagination = {};
@@ -157,6 +160,10 @@ export class ProductController {
 
         if (limit) {
             pagination.limit = parseInt(limit as string);
+        }
+
+        if (req?.auth?.roles?.includes(Roles.MANAGER)) {
+            filter.tenantId = req?.auth?.tenantId;
         }
 
         const products = await this.productService.findAll(
@@ -181,7 +188,6 @@ export class ProductController {
             data: product,
         });
     };
-
 
     delete = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;

@@ -63,7 +63,9 @@ router.patch(
 
 router.get(
     '/',
-    requestWrapper(async (req, res, next) => productController.getAll(req, res, next)
+    authentication as RequestHandler,
+    isValidRoleMiddleware([Roles.ADMIN, Roles.MANAGER]) as RequestHandler,
+    requestWrapper(async (req, res, next) => productController.getAll(req as AuthRequest, res, next)
     ),
 );
 

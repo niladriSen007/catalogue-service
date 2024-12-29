@@ -1,40 +1,39 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { Readable } from 'stream';
+import { FileStorage, ImageFileData } from '../types/storage';
+import { UploadedFile } from 'express-fileupload';
+import { Config } from '../../config';
 
+// Configure Cloudinary with your credentials
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: Config.CLOUDINARY_CLOUD_NAME,
+    api_key:Config.CLOUDINARY_API_KEY,
+    api_secret: Config.CLOUDINARY_API_SECRET,
 });
 
-export class CloudinaryStorage {
-  async uploadFile(file: Express.Multer.File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'uploads' },
-        (error, result) => {
-          if (error) {
-            return reject(error);
-          }
-          resolve(result?.secure_url || '');
+export class CloudinaryStorage implements FileStorage {
+    // Method to upload an image
+    async uploadFile(file: UploadedFile): Promise<string> {
+        try {
+             const b64 = Buffer.from(file.data).toString("base64");
+    const dataURI = "data:" + file.mimetype + ";base64," + b64;
+            const result = await cloudinary.uploader.upload(dataURI);
+            return result.secure_url; // Return the secure URL of the uploaded image
+        } catch (error) {
+            console.error('Error uploading image to Cloudinary:', error);
+            throw new Error('Image upload failed');
         }
-      );
+    }
 
-      const readableStream = new Readable();
-      readableStream.push(file.buffer);
-      readableStream.push(null);
-      readableStream.pipe(uploadStream);
-    });
-  }
-
-  async deleteFile(publicId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
-        if (error) {
-          return reject(error);
+    async deleteFile(fileName: string): Promise<void> {
+        try {
+            await cloudinary.uploader.destroy(fileName);
+        } catch (error) {
+            console.error('Error deleting image from Cloudinary:', error);
+            throw new Error('Image deletion failed');
         }
-        resolve();
-      });
-    });
-  }
+    }
+
+    getObjectUri(fileName: string): string {
+        return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${fileName}`;
+    }
 }

@@ -8,15 +8,17 @@ import { CreateProductValidator, UpdateProductValidator } from '../validator';
 import { ProductService } from '../service';
 import { logger } from '../../config/logger';
 import fileUpload from 'express-fileupload';
-import { S3Storage } from '../../common/services/S3Storage';
+// import { S3Storage } from '../../common/services/S3Storage';
 import createHttpError from 'http-errors';
+import { CloudinaryStorage } from '../../common/services/CloudinaryStorage';
 
 const productService = new ProductService();
-const s3Service = new S3Storage();
+// const s3Service = new S3Storage();
+const cloudinaryService = new CloudinaryStorage();
 const productController = new ProductController(
     productService,
     logger,
-    s3Service,
+    cloudinaryService,
 );
 const router = express.Router();
 

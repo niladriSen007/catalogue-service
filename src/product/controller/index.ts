@@ -32,11 +32,11 @@ export class ProductController {
         //image upload
         const image = req.files?.imageUrl as UploadedFile;
 
+
+        // console.log(image,"image");
+
         const imageName = uuidv4();
-        const imageUrl =  await this.fileStorage.uploadFile({
-            fileName: imageName,
-            fileData: image.data.buffer,
-        });
+        const imageUrl =  await this.fileStorage.uploadFile(req.files?.imageUrl as UploadedFile);
 
         const {
             name,
@@ -103,10 +103,7 @@ export class ProductController {
             const image = req.files?.imageUrl as UploadedFile;
             imageName = uuidv4();
             oldImage = existingProduct.imageUrl;
-            uploadedImageUrl = await this.fileStorage.uploadFile({
-                fileName: imageName,
-                fileData: image.data.buffer,
-            });
+            uploadedImageUrl = await this.fileStorage.uploadFile(image);
             await this.fileStorage.deleteFile(oldImage);
         }
 
